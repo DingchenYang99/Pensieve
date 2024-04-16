@@ -5,9 +5,23 @@
 # Pensieve: Retrospect-then-Compare mitigates Visual Hallucination
 This is the official repo of our work "Pensieve", a training free method to mitigate visual hallucination in Multi-modal LLMs.
 
+## 🪜 Updates
+- [2024-04-??]: 🧑🏻‍💻👩🏼‍💻 Code Release
+- [2024-03-21]: 🎉🎉 Our Paper is released on Arxiv: https://arxiv.org/abs/2403.14401
+
 ## 🖼️ Overview
 ![VCD](assets/method_new.png)
 - We introduce Pensieve, **a plug-and-play and training-free** method to mitigate visual hallucination and enhance the specificity of image descriptions.
+🧑🏻‍💻
+## 🎮 Get started
+
+### Environment Setup
+
+### Download Models
+
+### Reference Database
+
+## 🏅 Experiments
 
 ## 🔗 Related Projects
 - [VCD](https://github.com/DAMO-NLP-SG/VCD): Mitigating Object Hallucinations in Large Vision-Language Models through Visual Contrastive Decoding
