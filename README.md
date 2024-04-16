@@ -6,13 +6,13 @@
 This is the official repo of our work "Pensieve", a training free method to mitigate visual hallucination in Multi-modal LLMs.
 
 ## 🪜 Updates
-- [2024-04-??]: 🧑🏻‍💻👩🏼‍💻 Code Release
-- [2024-03-21]: 🎉🎉 Our Paper is released on Arxiv: https://arxiv.org/abs/2403.14401
+- [2024-04-??]: 🧑🏻‍💻👩🏼‍💻 Code Release.
+- [2024-03-21]: 🎉🎉 Our [Paper](https://arxiv.org/abs/2403.14401) is released.
 
 ## 🖼️ Overview
 ![VCD](assets/method_new.png)
 - We introduce Pensieve, **a plug-and-play and training-free** method to mitigate visual hallucination and enhance the specificity of image descriptions.
-🧑🏻‍💻
+
 ## 🎮 Get started
 
 ### Environment Setup
