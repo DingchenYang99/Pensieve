@@ -21,6 +21,8 @@ This is the official repo of our work "Pensieve", a training free method to miti
 
 ### Reference Database
 
+### Run Inference
+
 ## 🏅 Experiments
 
 ## 🔗 Related Projects
