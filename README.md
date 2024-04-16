@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-<a target="_blank"><img src="assets/caption_results.png" alt="Pensieve" style="width: 85%; min-width: 200px; display: block; margin: auto;"></a>
+<a target="_blank"><img src="assets/caption_results.png" alt="Pensieve" style="width: 100%; min-width: 200px; display: block; margin: auto;"></a>
 </p>
 
 # Pensieve: Retrospect-then-Compare mitigates Visual Hallucination
