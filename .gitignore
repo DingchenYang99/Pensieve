@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+.vscode/launch.json
+*.DS_Store
+eggs/
+.eggs/
+*.egg-info/
+*.egg
