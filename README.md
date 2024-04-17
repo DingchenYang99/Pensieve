@@ -25,6 +25,7 @@ This is the official repo of our work "Pensieve", a training free method to miti
 
 ### Evaluation Metrics
 - Install [pycocoevalcap](https://github.com/tylin/coco-caption/tree/master) for image captioning evaluation.
+- Prepare the [FaithScore](https://github.com/bcdnlp/FAITHSCORE) for visual hallucination evaluation
 
 ### Run Inference
 
