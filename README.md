@@ -17,15 +17,21 @@ This is the official repo of our work "Pensieve", a training free method to miti
 
 ### Environment Setup
 
+### Download Datasets
+
 ### Download Models
 
-### Reference Database
+### Prepare Pensieve
+
+### Evaluation Metrics
+- Install [pycocoevalcap](https://github.com/tylin/coco-caption/tree/master) for image captioning evaluation.
 
 ### Run Inference
 
 ## 🏅 Experiments
 
 ## 🔗 Related Projects
+Our project is built upon VCD. We sincerely acknowledge the great contribution of the following works:
 - [VCD](https://github.com/DAMO-NLP-SG/VCD): Mitigating Object Hallucinations in Large Vision-Language Models through Visual Contrastive Decoding
 - [DOLA](https://github.com/salesforce/LAVIS/tree/main/projects/instructblip): Decoding by Contrasting Layers Improves Factuality in Large Language Models
 - [FaishScore](https://github.com/bcdnlp/FAITHSCORE): Evaluating Hallucinations in Large Vision-Language Models
