@@ -1,0 +1,279 @@
+import argparse
+import torch
+import json
+from tqdm import tqdm
+import shortuuid
+import sys
+import os
+from transformers import set_seed
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from llava.utils import disable_torch_init
+from lavis.models import load_model_and_preprocess
+
+from PIL import Image
+import math
+from pathlib import Path
+import h5py
+# import kornia
+from data.whoops.whoops_utils import load_data_for_whoops
+from evaluation.eval_utils import get_timestamp, find_good_nns
+from decoding.vcd_add_noise import add_diffusion_noise
+from decoding.pensieve_sample import evolve_sampling
+from decoding.pensieve_greedy_search import evolve_greedy_search
+
+evolve_sampling()
+evolve_greedy_search()
+
+def split_list(lst, n):
+    """Split a list into n (roughly) equal-sized chunks"""
+    chunk_size = math.ceil(len(lst) / n)  # integer division
+    return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
+
+def get_chunk(lst, n, k):
+    chunks = split_list(lst, n)
+    return chunks[k]
+
+def eval_model(args):
+    # Load Model
+    disable_torch_init()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # loads InstructBLIP model
+    # For large_sized model,
+    model, vis_processors, _ = load_model_and_preprocess(name="blip2_vicuna_instruct",
+                                                         model_type="vicuna7b", 
+                                                         is_eval=True, 
+                                                         device=device)
+    
+    whoops_data = load_data_for_whoops(args.whoops_path)
+    
+    answers_file = os.path.expanduser(os.path.join(args.result_path, args.answers_file_name))
+    ans_file = open(answers_file, "w")
+    
+    if args.use_rancd or args.save_logits:
+        q_nn_file_name = args.q_nn_file_path + \
+            f'retrieved_{args.database}_imgs_clip_vit_l14_dino_vit_l14_32nns_whoops_images.json'
+        q_nn_file = json.load(open(q_nn_file_name, 'r'))
+        
+    if args.save_logits:
+        if args.logits_file_name is None:
+            args.logits_file_name = args.answers_file_name.replace('.json', '.hdf5')
+        h5py_file = os.path.expanduser(os.path.join(args.result_path, args.logits_file_name))
+        logits_file = h5py.File(h5py_file, 'w')
+        
+    instruct = " please provide only one sentence, be precise and faithful to the image."
+    
+    for line in tqdm(whoops_data): 
+        idx = line['image_id']
+        image_file = line['file_name']
+        caption_gt = line['selected_caption']
+        qs = "Please provide a short depiction of the picture,"  # copy from instructBLIP paper
+        prompt = qs + instruct
+
+        raw_image = Image.open(image_file).convert("RGB")
+        image_tensor = vis_processors["eval"](raw_image).unsqueeze(0).to(device)
+
+        if args.use_rancd:
+            image_tensor_cd = add_diffusion_noise(image_tensor, args.oracle_noise_step)
+            image_id_q = line["image_id"]
+            image_id_nns = q_nn_file[image_id_q]["nnimg_file_names"]
+            image_id_nns_keep = find_good_nns(image_id_nns, image_id_q, args.kNN)
+            image_tensor_nn_l = []
+            for image_id_nn in image_id_nns_keep:
+                if (not image_id_nn.endswith('.jpg')) and 'coco' in args.database:
+                    image_id_nn += '.jpg'
+                image_path_nn = os.path.join(args.coco_path, image_id_nn)
+                image_nn = Image.open(image_path_nn).convert("RGB")
+                image_tensor_nn = vis_processors["eval"](image_nn).unsqueeze(0).to(device)
+                image_tensor_nn_l.append(image_tensor_nn)
+        else:
+            image_tensor_cd = None
+            image_tensor_nn_l = None  
+                
+        with torch.inference_mode():
+            outputs, scores_tuple, caption_ids = model.generate(
+                {"image": image_tensor, "prompt": prompt},
+                images_cd=image_tensor_cd,
+                images_racd=image_tensor_nn_l,
+                alpha_noise=args.alpha_noise,
+                alpha_nns=args.alpha_nns,
+                alpha_base=args.alpha_base,
+                racd_topk=args.racd_topk,
+                jsd_thres=args.jsd_thres,
+                use_nucleus_sampling=args.do_sample, 
+                num_beams=args.num_beams,
+                top_p=args.top_p,
+                top_k=args.top_k,
+                repetition_penalty=1.,
+                return_dict_in_generate=True,
+                output_scores=True,
+                output_hidden_states=False,
+                )
+        intact_scores = torch.cat(scores_tuple[:-2], dim=0)
+        outputs = outputs[0]
+        caption_ids = caption_ids[:, 1:-2]  # remove pad_token, eos_token
+        
+        # visual hallucination analysis by replacing image tokens
+        # decode token by token, but do NOT modify Q-former's textual input
+        outputs_per_token_list = [model.llm_tokenizer.convert_ids_to_tokens(
+            caption_ids[:, i:i+1])[0] for i in range(caption_ids.shape[1])]
+        output_caption_len = caption_ids.shape[1]
+        assert len(outputs_per_token_list) == output_caption_len
+        
+        if args.save_logits:
+            # for visual hallucination analysis
+            # diffused image input
+            noised_scores_dict = {}
+            for noise_step in args.noise_steps:
+                if noise_step not in noised_scores_dict.keys():
+                    noised_scores_dict[noise_step] = ()
+                image_tensor_noise = add_diffusion_noise(image_tensor, noise_step)
+                for i in range(output_caption_len):
+                    noise_input_ids = caption_ids[:, :i].clone()
+                    _, noise_scores_tuple, _ = model.generate(
+                            {"image": image_tensor_noise, "prompt": prompt},
+                            use_nucleus_sampling=False,
+                            num_beams=1,
+                            max_length=1,
+                            extra_input_ids=noise_input_ids,
+                            return_dict_in_generate=True,
+                            output_scores=True,
+                            )
+                    assert len(noise_scores_tuple) == 1
+                    noised_scores_dict[noise_step] += noise_scores_tuple
+                assert len(noised_scores_dict[noise_step]) == len(outputs_per_token_list)
+            
+            # retrieved image input
+            nns_scores_dict = {}
+            image_id_q = line["image_id"]
+            image_id_nns = q_nn_file[image_id_q]["nnimg_file_names"]
+            image_id_nns_keep = find_good_nns(image_id_nns, image_id_q, args.kNN)
+            for k in range(args.kNN):
+                nns_scores_dict[k] = ()
+                image_id_nn = image_id_nns_keep[k]
+                if not image_id_nn.endswith('.jpg') and 'coco' in args.database:
+                    image_id_nn += '.jpg'
+                image_path_nn = os.path.join(args.coco_path, image_id_nn)
+                image_nn = Image.open(image_path_nn).convert("RGB")
+                image_tensor_nn = vis_processors["eval"](image_nn).unsqueeze(0).to(device)
+                for i in range(output_caption_len):
+                    nn_input_ids = caption_ids[:, :i].clone()
+                    _, nn_scores_tuple, _ = model.generate(
+                            {"image": image_tensor_nn, "prompt": prompt},
+                            use_nucleus_sampling=False, # do not sample
+                            num_beams=1,
+                            max_length=1,
+                            extra_input_ids=nn_input_ids,
+                            return_dict_in_generate=True,
+                            output_scores=True,
+                            )
+                    assert len(nn_scores_tuple) == 1
+                    nns_scores_dict[k] += nn_scores_tuple
+                assert len(nns_scores_dict[k]) == output_caption_len
+                
+        ans_file.write(json.dumps({"image_id": idx,
+                                   "caption_gt": caption_gt,
+                                   "caption_pred": outputs,
+                                   "caption_tokens": outputs_per_token_list,
+                                   "model_id": "instructblip",
+                                   "metadata": {"noise steps": args.oracle_noise_step,
+                                                "kNN": args.kNN}}) + "\n")
+        ans_file.flush()
+        if args.save_logits:
+            logits_file.create_dataset(str(idx)+'_intact', 
+                                    (intact_scores.shape[0], intact_scores.shape[1]), 
+                                    data=intact_scores.cpu().numpy())
+            for noise_step in args.noise_steps:
+                noised_scores = torch.cat(noised_scores_dict[noise_step], dim=0)
+                assert noised_scores.shape == intact_scores.shape
+                logits_file.create_dataset(str(idx)+f'_noise{noise_step}', 
+                                (noised_scores.shape[0], noised_scores.shape[1]), 
+                                data=noised_scores.cpu().numpy())
+            for k in range(args.kNN):
+                nn_scores = torch.cat(nns_scores_dict[k], dim=0)
+                assert nn_scores.shape == intact_scores.shape
+                logits_file.create_dataset(str(idx)+f'_nn{k}', 
+                                (nn_scores.shape[0], nn_scores.shape[1]), 
+                                data=nn_scores.cpu().numpy())
+            
+    ans_file.close()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--model_base", type=str, default=None)
+    parser.add_argument("--whoops_path", type=str, default="")
+    parser.add_argument("--result_path", type=str, default=None)
+    parser.add_argument("--answers_file_name", type=str, default=None)
+    parser.add_argument("--save_logits", type=bool, default=False)
+    parser.add_argument("--logits_file_name", type=str, default=None)
+    
+    parser.add_argument("--conv_mode", type=str, default="llava_v1")
+    parser.add_argument("--num_chunks", type=int, default=1)
+    parser.add_argument("--chunk_idx", type=int, default=0)
+    parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--top_p", type=float, default=1)
+    parser.add_argument("--top_k", type=int, default=None)
+    
+    parser.add_argument("--alpha_noise", type=float)
+    parser.add_argument("--alpha_nns", type=float)
+    parser.add_argument("--alpha_base", type=float)
+    parser.add_argument("--jsd_thres", type=float, default=None)
+    
+    parser.add_argument("--use_rancd", action='store_true', default=False)
+    parser.add_argument("--decode_method", type=str, default='', choices=['greedy', 'sample', 'beamsearch'])
+    parser.add_argument("--noise_steps", type=list, help="noise step list")
+    parser.add_argument("--oracle_noise_step", type=int, default=900)
+    parser.add_argument("--kNN", type=int)
+    parser.add_argument("--racd_topk", type=int)
+    args = parser.parse_args()
+    
+    #TODO set your path for model and whoops data
+    args.whoops_path = '/DATA3/yangdingchen/whoops/'
+    args.result_path = args.whoops_path + 'results/' + get_timestamp() 
+    Path(args.result_path).mkdir(parents=True, exist_ok=True)
+    
+    args.decode_method = 'greedy'
+    args.use_rancd = True
+    args.save_logits = False # for visual hallucination evaluation
+    
+    if args.decode_method == 'greedy':
+        args.num_beams = 1
+        args.do_sample = False
+    elif args.decode_method == 'sample':
+        args.num_beams = 1
+        args.do_sample = True
+    elif args.decode_method == 'beamsearch':
+        args.num_beams = 3
+        args.do_sample = False
+    else:
+        raise NotImplementedError
+    
+    if args.save_logits:
+        assert not args.do_sample
+        args.noise_steps = [999]
+        args.kNN = 4
+        
+    decode_assist = 'wo-cd'
+        
+    if args.use_rancd:
+        assert args.decode_method in ['greedy', 'sample']
+        args.oracle_noise_step = 500
+        args.racd_topk = 50
+        args.kNN = 2
+        decode_assist = 'w-rancd'
+    
+        args.alpha_noise = 0.04
+        args.alpha_nns = 0.05
+        args.alpha_base = 1.2
+        
+        args.jsd_thres = None
+        
+    answer_file_prefix = 'instructblip_whoops_zeroshot_captions_image'
+    args.answers_file_name = answer_file_prefix + f'_{args.decode_method}_{decode_assist}.json'
+    
+    args.database = 'coco'
+    args.coco_path = '/DATA3/yangdingchen/coco/images/'
+    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    set_seed(args.seed)
+    eval_model(args)
