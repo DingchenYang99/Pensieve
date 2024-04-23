@@ -67,7 +67,7 @@ def retrieve_nn_imgs(
     data_dir = query_file_path + sub_folder
 
     if dataset_q == 'whoops':
-        test_data = load_data_for_whoops(query_file_path)
+        test_data = load_data_for_whoops(query_file_path)[:30]
         img_suffix = '.png'
     elif dataset_q == 'llavabench':
         test_data = load_data_for_llavabench(query_file_path)
@@ -88,12 +88,16 @@ def retrieve_nn_imgs(
     print(f"total {xb_image_paths_len} neighbor candidates")
     
     print('Loading CLIP encoder')
-    clip_image_processor, clip_vision_tower = load_clip_vision_model(clip_model_name)
+    #TODO set model path
+    clip_model_path = '/home/lufan/Projects/smallcap/pretrained/'
+    clip_image_processor, clip_vision_tower = load_clip_vision_model(clip_model_name, clip_model_path)
     clip_vision_tower.requires_grad_(False)
     clip_vision_tower = clip_vision_tower.to(device=device, dtype=torch.float16)
     
     print('Loading DINO encoder')
-    dino_vision_tower = load_dino_vision_model(dino_model_name)
+    #TODO set model path
+    dino_model_path = '/home/lufan/.cache/torch/hub/facebookresearch/dinov2/'
+    dino_vision_tower = load_dino_vision_model(dino_model_name, dino_model_path)
     dino_vision_tower.requires_grad_(False)
     dino_vision_tower = dino_vision_tower.to(device=device, dtype=torch.float16)
     
@@ -357,7 +361,7 @@ if __name__ == '__main__':
     #TODO set your read and write path
     read_path = '/DATA3/yangdingchen/datastore/'
     index_dataset = 'coco'
-    save_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    save_path = '/home/lufan/Projects/Pensieve/source/rag/q_nn_files/'
     
     if dataset_q in ['whoops','llavabench']:
         retriever = 'clip_vit_l14_dino_vit_l14'
