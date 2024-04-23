@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import faiss
 import json
 import os
@@ -239,11 +243,11 @@ def build_txt_index(feats_clip):
 def build_coco_img_idx(clip_model_name, dino_model_name): 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # TODO set your data and save path
-    coco_data_path = '/home/lufan/Projects/smallcap/caption/annotations/dataset_coco.json'
-    coco_image_path = '/DATA3/yangdingchen/coco/images/'
-    coco_index_path = '/DATA3/yangdingchen/datastore/coco_img/' + 'clip_vit_l14_dino_vit_l14/'
-    clip_model_path = '/home/lufan/Projects/smallcap/pretrained/'
-    dino_model_path = '/home/lufan/.cache/torch/hub/facebookresearch/dinov2/'
+    coco_data_path = '/path/to/your/dataset_coco.json'
+    coco_image_path = '/path/to/your/coco/images/'
+    coco_index_path = '/path/to/your/datastore/coco_img/' + 'clip_vit_l14_dino_vit_l14/'
+    clip_model_path = '/path/to/your/clip/dir/'
+    dino_model_path = '/path/to/your/.cache/torch/hub/facebookresearch/dinov2/'
     Path(coco_index_path).mkdir(parents=True, exist_ok=True)
     
     print('Loading data')
@@ -281,11 +285,11 @@ def build_coco_img_idx(clip_model_name, dino_model_name):
 def build_coco_cap_idx(clip_model_name, dino_model_name=None): 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # TODO set your data and save path
-    pope_data_path = '/home/lufan/Projects/VCD/experiments/data/POPE/'
-    mme_data_path = "/DATA3/yangdingchen/mme/"
-    coco_data_path = '/home/lufan/Projects/smallcap/caption/annotations/dataset_coco.json'
-    coco_index_path = '/DATA3/yangdingchen/datastore/coco_cap/' + 'clip_vit_l14/'
-    clip_txt_model_path = '/home/lufan/Projects/smallcap/pretrained/'
+    pope_data_path = '/path/to/your/Pensieve/source/data/POPE/'
+    mme_data_path = "/path/to/your/MME_Benchmark_release_version/"
+    coco_data_path = '/path/to/your/dataset_coco.json'
+    coco_index_path = '/path/to/your/datastore/coco_cap/' + 'clip_vit_l14/'
+    clip_txt_model_path = '/path/to/your/clip/dir/'
     Path(coco_index_path).mkdir(parents=True, exist_ok=True)
     
     print('Loading data')
