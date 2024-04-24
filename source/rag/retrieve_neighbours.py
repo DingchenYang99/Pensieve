@@ -67,7 +67,7 @@ def retrieve_nn_imgs(
     data_dir = query_file_path + sub_folder
 
     if dataset_q == 'whoops':
-        test_data = load_data_for_whoops(query_file_path)[:30]
+        test_data = load_data_for_whoops(query_file_path)
         img_suffix = '.png'
     elif dataset_q == 'llavabench':
         test_data = load_data_for_llavabench(query_file_path)
@@ -89,14 +89,14 @@ def retrieve_nn_imgs(
     
     print('Loading CLIP encoder')
     #TODO set model path
-    clip_model_path = '/home/lufan/Projects/smallcap/pretrained/'
+    clip_model_path = '/path/to/your/clip/dir/'
     clip_image_processor, clip_vision_tower = load_clip_vision_model(clip_model_name, clip_model_path)
     clip_vision_tower.requires_grad_(False)
     clip_vision_tower = clip_vision_tower.to(device=device, dtype=torch.float16)
     
     print('Loading DINO encoder')
     #TODO set model path
-    dino_model_path = '/home/lufan/.cache/torch/hub/facebookresearch/dinov2/'
+    dino_model_path = '/path/to/your/.cache/torch/hub/facebookresearch/dinov2/'
     dino_vision_tower = load_dino_vision_model(dino_model_name, dino_model_path)
     dino_vision_tower.requires_grad_(False)
     dino_vision_tower = dino_vision_tower.to(device=device, dtype=torch.float16)
@@ -112,7 +112,6 @@ def retrieve_nn_imgs(
     distances, nns = retrieve_nns(index, (clip_image_feats, dino_image_feats), k)
     retrieved_image_ids = {}
     for nns_list, dists_list, image_id, file_name in zip(nns, distances, xq_image_ids, xq_file_names):
-        
         assert len(nns_list) == len(dists_list)
         good_nns = {"image_id": image_id,
                     "file_name": file_name,
@@ -159,7 +158,6 @@ def retrieve_nn_caps(
         raise NotImplementedError
     
     print('Loading test data')
-    data_dir = query_file_path + sub_folder
     if dataset_q == 'mme':
         test_data = load_data_mme(query_file_path, sub_folder)
     elif 'pope' in dataset_q:
@@ -218,7 +216,9 @@ def retrieve_nn_caps(
     xb_captions = json.load(open(captions_path, 'r'))
     
     print('Loading CLIP encoder')
-    clip_model, clip_tokenizer = load_clip_text_model(clip_model_name)
+    #TODO set model path
+    clip_txt_model_path = '/path/to/your/clip/dir/'
+    clip_model, clip_tokenizer = load_clip_text_model(clip_model_name, clip_txt_model_path)
     clip_model.requires_grad_(False)
     clip_model = clip_model.to(device=device, dtype=torch.float16)
     
@@ -306,12 +306,12 @@ def calculate_bleu_score(qs_id, question, nnimg_captions, metric):
 
 
 if __name__ == '__main__':
-    
+    # TODO set your test data
     dataset_q = 'whoops'
     bleu_rerank = False  # implemented for mme only
     # TODO set your test data path
     if dataset_q == 'mme':
-        query_file_path = '/DATA3/yangdingchen/mme/MME_Benchmark_release_version/'
+        query_file_path = '/path/to/your/MME_Benchmark_release_version/'
         interested_tasks = [
             "color", 
             # "count", 
@@ -325,33 +325,33 @@ if __name__ == '__main__':
             # "OCR",
         ]
     elif dataset_q == 'pope_coco':
-        query_file_path = '/home/lufan/Projects/VCD/experiments/data/POPE/'
+        query_file_path = '/path/to/your/Pensieve/source/data/POPE/'
         interested_tasks = [
             'coco_adversarial',
-            'coco_popular',
-            'coco_random',
+            # 'coco_popular',
+            # 'coco_random',
         ]
     elif dataset_q == 'pope_aokvqa':
-        query_file_path = '/home/lufan/Projects/VCD/experiments/data/POPE/'
+        query_file_path = '/path/to/your/Pensieve/source/data/POPE/'
         interested_tasks = [
             'aokvqa_adversarial',
             'aokvqa_popular',
             'aokvqa_random',
         ]
     elif dataset_q == 'pope_gqa':
-        query_file_path = '/home/lufan/Projects/VCD/experiments/data/POPE/'
+        query_file_path = '/path/to/your/Pensieve/source/data/POPE/'
         interested_tasks = [
             'gqa_adversarial',
             'gqa_popular',
             'gqa_random',
         ]
     elif dataset_q == 'whoops':
-        query_file_path = '/DATA3/yangdingchen/whoops/'
+        query_file_path = '/path/to/your/whoops/'
         interested_tasks = [
             'whoops_images'
         ]
     elif dataset_q == 'llavabench':
-        query_file_path = '/DATA3/yangdingchen/llava-bench/'
+        query_file_path = '/path/to/your/llava-bench/'
         interested_tasks = [
             'images'
         ]
@@ -359,9 +359,9 @@ if __name__ == '__main__':
         raise NotImplementedError
     
     #TODO set your read and write path
-    read_path = '/DATA3/yangdingchen/datastore/'
+    read_path = '/path/to/your/datastore/'
     index_dataset = 'coco'
-    save_path = '/home/lufan/Projects/Pensieve/source/rag/q_nn_files/'
+    save_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     
     if dataset_q in ['whoops','llavabench']:
         retriever = 'clip_vit_l14_dino_vit_l14'
@@ -376,8 +376,10 @@ if __name__ == '__main__':
                 retriever,
                 k=32)
             
-    elif dataset_q in ['pope_coco','mme']:
+    elif dataset_q in ['pope_coco', 'pope_aokvqa', 'pope_gqa','mme']:
         retriever = 'clip_vit_l14' 
+        if dataset_q == 'mme':
+            bleu_rerank = True
         for interested_task in interested_tasks:
             retrieve_nn_caps(
                 dataset_q,
