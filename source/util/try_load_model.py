@@ -15,15 +15,13 @@ from lavis.models import load_model_and_preprocess
 model_name = "instructblip"
 
 if model_name == "llava15":
-    model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
+    model_path = '/path/to/your/llava-v1.5-7b'
     YES_TOKEN = "\u2581Yes"
     NO_TOKEN = "\u2581No"
-    # result_path = "/DATA3/yangdingchen/whoops/results/240110-152936"
 elif model_name == "instructblip":
-    model_path = "/DATA3/yangdingchen/checkpoint/vicuna-7b-v1.1"
+    model_path = "/path/to/your/checkpoint/vicuna-7b-v1.1"
     YES_TOKEN = "\u2581yes"
     NO_TOKEN = "\u2581no"
-    # result_path = "/DATA3/yangdingchen/whoops/results/240118-130046"
 else:
     raise NotImplementedError
             

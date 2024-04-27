@@ -38,13 +38,13 @@ if __name__ == '__main__':
     
     args.vem_type = 'ofa_ve'
     #TODO set your openai-key
-    args.openai_key = ''
+    args.openai_key = 'sk-'
     #TODO set your model, data and results path
-    args.llava_path = "/DATA3/yangdingchen/checkpoint/llava-v1.5-13b"
-    args.llama_path = "/DATA3/yangdingchen/checkpoint/llama-2-7b-hf"
-    args.whoops_path = '/DATA3/yangdingchen/whoops/'
+    args.llava_path = "/path/to/your/llava-v1.5-13b"  # optional, set if vem_type==llava
+    args.llama_path = "/path/to/your/llama-2-7b-hf"  # optional, set if use_llama==True
+    args.whoops_path = '/path/to/your/whoops/'
     data_root = args.whoops_path + 'results/'
-    time_dir = '240311-130714'
+    time_dir = 'yymmdd-hhmmss'
     dataDir = data_root + time_dir
     
     image_suffix = 'png'
@@ -53,9 +53,8 @@ if __name__ == '__main__':
     args.model_name = 'llava15'
     # args.model_name = 'instructblip'
     
-    # decode_method = 'greedy'
-    decode_method = 'sample'
-    # decode_method = 'beamsearch'
+    decode_method = 'greedy'
+    # decode_method = 'sample'
     
     # decode_assist = 'wo-cd'
     decode_assist = 'w-rancd'
@@ -63,6 +62,7 @@ if __name__ == '__main__':
     args.answer_file = dataDir + f'/{args.model_name}_whoops_zeroshot_captions_image_{decode_method}_{decode_assist}.json'
     result_file = args.answer_file.replace('.json', f'_{args.vem_type}_fs_results.jsonl')
     try:
+        # if you have already extracted atomic facts
         atomic_facts_file = args.answer_file.replace('.json', f'_ofa_ve_fs_results.jsonl')
         atomic_facts_list = [json.loads(q) for q in open(os.path.expanduser(atomic_facts_file), "r")]
         pre_atomic_facts = [ii["atomic_facts"] for ii in atomic_facts_list]
@@ -85,8 +85,9 @@ if __name__ == '__main__':
         file_path = args.whoops_path + f'whoops_images/{image_id}.{image_suffix}'
         images.append(file_path)
         answers.append(res_dict["caption_pred"])
-        # there is only one sentence image description,
-        # there is no analytical content
+        # in whoops benchmark,
+        # there is only a single sentence image description,
+        # i.e., there is no analytical content
         labeld_sub_sens.append(res_dict["caption_pred"] + ' [D]')
         cnt += 1
     assert len(answers) == len(images)

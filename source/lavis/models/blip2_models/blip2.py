@@ -29,8 +29,8 @@ from transformers import BertTokenizer
 class Blip2Base(BaseModel):
     @classmethod
     def init_tokenizer(cls, truncation_side="right"):
-        # cd_comments: assign bertTokenizer
-        tokenizer = BertTokenizer.from_pretrained("/DATA3/yangdingchen/checkpoint/bert-base-uncased", 
+        # TODO assign bertTokenizer
+        tokenizer = BertTokenizer.from_pretrained("/path/to/your/bert-base-uncased", 
                                                   truncation_side=truncation_side)
         tokenizer.add_special_tokens({"bos_token": "[DEC]"})
         return tokenizer
@@ -47,16 +47,16 @@ class Blip2Base(BaseModel):
 
     @classmethod
     def init_Qformer(cls, num_query_token, vision_width, cross_attention_freq=2):
-        # cd_comments: assign bertTokenizer
-        encoder_config = BertConfig.from_pretrained("/DATA3/yangdingchen/checkpoint/bert-base-uncased")
+        # TODO assign bertTokenizer
+        encoder_config = BertConfig.from_pretrained("/path/to/your/bert-base-uncased")
         encoder_config.encoder_width = vision_width
         # insert cross-attention layer every other block
         encoder_config.add_cross_attention = True
         encoder_config.cross_attention_freq = cross_attention_freq
         encoder_config.query_length = num_query_token
-        # cd_comments: assign bertTokenizer
+        # TODO assign bertTokenizer
         Qformer = BertLMHeadModel.from_pretrained(
-            "/DATA3/yangdingchen/checkpoint/bert-base-uncased", config=encoder_config
+            "/path/to/your/bert-base-uncased", config=encoder_config
         )
         query_tokens = nn.Parameter(
             torch.zeros(1, num_query_token, encoder_config.hidden_size)

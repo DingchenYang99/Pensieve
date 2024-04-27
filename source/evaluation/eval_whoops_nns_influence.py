@@ -25,7 +25,7 @@ topd = 10
 
 #TODO set your data and results path
 
-result_path = '/DATA3/yangdingchen/whoops/results/'
+result_path = '/path/to/your/whoops/results/'
 knn = 4
 
 analysis_file_name = f'{model_name}_whoops_headvocab_nns_analysis_image_{sample_method}_{decode_assist}.json'
@@ -36,14 +36,15 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 print("loading tokenizer")
 if model_name == 'llava15':
-    result_time_dir = ''
-    model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
+    #TODO set your model and result path
+    result_time_dir = 'yymmdd-hhmmss'
+    model_path = '/path/to/your/llava-v1.5-7b'
     model_path = os.path.expanduser(model_path)
     # disable_torch_init()
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
 elif model_name == 'instructblip':
-    result_time_dir = ''
-    llm_model = "/DATA3/yangdingchen/checkpoint/vicuna-7b-v1.1"
+    result_time_dir = 'yymmdd-hhmmss'
+    llm_model = "/path/to/your/vicuna-7b-v1.1"
     tokenizer = LlamaTokenizer.from_pretrained(llm_model, use_fast=False, truncation_side="left")
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     tokenizer.add_special_tokens({'bos_token': '</s>'})

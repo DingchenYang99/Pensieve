@@ -8,9 +8,8 @@ model:
   load_finetuned: False
   load_pretrained: True
 
-  # cd_comments: set right path for pretrained blip ckpt
-  # pretrained: "./checkpoints/instruct_blip_vicuna7b_trimmed.pth"
-  pretrained: "/DATA3/yangdingchen/checkpoint/vicuna-7b-v1.1/instruct_blip_vicuna7b_trimmed.pth"
+  # TODO set right path for pretrained blip ckpt
+  pretrained: "/path/to/your/vicuna-7b-v1.1/instruct_blip_vicuna7b_trimmed.pth"
 
   finetuned: ""
 
@@ -24,9 +23,8 @@ model:
   # Q-Former
   num_query_token: 32
 
-  # cd_comments: set right path for vicuna
-  # llm_model: "/mnt/workspace/ckpt/vicuna-7b-v1.1"
-  llm_model: "/DATA3/yangdingchen/checkpoint/vicuna-7b-v1.1"
+  # TODo set right path for vicuna
+  llm_model: "/path/to/your/vicuna-7b-v1.1"
   # generation configs
   prompt: ""
 

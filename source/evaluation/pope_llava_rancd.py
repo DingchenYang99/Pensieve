@@ -160,8 +160,8 @@ if __name__ == "__main__":
     parser.add_argument("--model_path", type=str, default=None)
     parser.add_argument("--model_base", type=str, default=None)
     parser.add_argument("--image_folder", type=str, default="")
-    parser.add_argument("--question_file", type=str, default="tables/question.jsonl")
-    parser.add_argument("--answers_file", type=str, default="answer.jsonl")
+    parser.add_argument("--question_file", type=str, default="")
+    parser.add_argument("--answers_file", type=str, default="")
     
     parser.add_argument("--conv_mode", type=str, default="llava_v1")
     parser.add_argument("--num_chunks", type=int, default=1)
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--alpha_base", type=float)
     parser.add_argument("--jsd_thres", type=float, default=None)
     
-    parser.add_argument("--use_rancd", action='store_true', default=False)
+    parser.add_argument("--use_rancd", action='store_true', default=True)
     parser.add_argument("--oracle_noise_step", type=int)
     parser.add_argument("--kNN", type=int)
     parser.add_argument("--racd_topk", type=int)
@@ -183,13 +183,13 @@ if __name__ == "__main__":
     set_seed(args.seed)
     
     #TODO set your path for model and data
-    args.pope_path = "/home/lufan/Projects/VCD/experiments/data/POPE/"
-    args.model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
-    args.result_path = '/DATA3/yangdingchen/pope/results/' + get_timestamp()
+    args.pope_path = '/path/to/your/Pensieve/source/data/POPE/'
+    args.model_path = '/path/to/your/llava-v1.5-7b'
+    args.result_path = '/path/to/your/pope/results/' + get_timestamp()  # yymmdd-hhmmss 
     Path(args.result_path).mkdir(parents=True, exist_ok=True)
     
-    args.use_rancd = True
-    args.do_sample = False
+    args.use_rancd = True  # enable pensieve
+    args.do_sample = False  # use greedy decoding
     
     args.decode_assist = 'wo-cd'
     if args.use_rancd:
@@ -206,15 +206,14 @@ if __name__ == "__main__":
     
     args.dataset_name = "coco"
     args.question_types = ["random", "popular", "adversarial"]
-    
     if args.dataset_name == "coco" or args.dataset_name == "aokvqa":
-        args.image_folder = "/DATA3/yangdingchen/coco/images"
+        args.image_folder = "/path/to/your/coco/images"
     elif args.dataset_name == "gqa":
-        args.image_folder = "/DATA3/yangdingchen/gqa/images"
+        args.image_folder = "/path/to/your/gqa/images"
     else:
         raise NotImplementedError
     
     args.database = 'coco'
-    args.coco_path = f'/DATA3/yangdingchen/coco/images/'
-    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    args.coco_path = '/path/to/your/coco/images/'
+    args.q_nn_file_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     eval_model(args)

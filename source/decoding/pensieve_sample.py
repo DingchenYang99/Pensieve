@@ -20,7 +20,7 @@ from transformers.generation.stopping_criteria import (
 import transformers
 from transformers.generation.utils import SampleOutput, SampleDecoderOnlyOutput, SampleEncoderDecoderOutput
 
-from jsd import calculate_jsd
+from .jsd import calculate_jsd
 
 def sample(
         self,

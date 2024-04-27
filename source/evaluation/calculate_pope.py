@@ -3,17 +3,17 @@ import json
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--gt_files", type=str, default="data/POPE/coco_pope_popular.json")
-parser.add_argument("--gen_files", type=str, default="answer_files_POPE/llava15_coco_pope_popular_answers_no_cd.jsonl")
+parser.add_argument("--gt_files", type=str, default="")
+parser.add_argument("--gen_files", type=str, default="")
 args = parser.parse_args()
 
 #TODO set your result path
-anno_path = "/home/lufan/Projects/VCD/experiments/data/POPE/"
-result_path = "/DATA3/yangdingchen/pope/results/"
-timedir = ""
+anno_path = "/path/to/your/Pensieve/source/data/POPE/"
+result_path = "/path/to/your/pope/results/"
+timedir = "yymmdd-hhmmss"
 
-# model_name = "llava15"
-model_name = "instructblip"
+model_name = "llava15"
+# model_name = "instructblip"
 
 dataset_name = "coco"
 # dataset_name = "aokvqa"

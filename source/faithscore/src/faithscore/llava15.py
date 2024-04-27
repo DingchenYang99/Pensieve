@@ -31,7 +31,8 @@ class LLaVA:
         disable_torch_init()
         model_path = os.path.expanduser(model_path)
         model_name = get_model_name_from_path(model_path)
-        self.tokenizer, self.model, self.image_processor, self.context_len = load_pretrained_model(model_path, None, model_name)
+        self.tokenizer, self.model, self.image_processor, self.context_len = load_pretrained_model(
+            model_path, None, model_name)
 
     def eval(self, image_file, qs):
         if self.model.config.mm_use_im_start_end:
@@ -44,7 +45,8 @@ class LLaVA:
         conv.append_message(conv.roles[1], None)
         prompt = conv.get_prompt()
 
-        input_ids = tokenizer_image_token(prompt, self.tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
+        input_ids = tokenizer_image_token(prompt, self.tokenizer, IMAGE_TOKEN_INDEX, 
+                                          return_tensors='pt').unsqueeze(0).cuda()
 
         image = Image.open(image_file)
         image_tensor = self.image_processor.preprocess(image, return_tensors='pt')['pixel_values'][0]

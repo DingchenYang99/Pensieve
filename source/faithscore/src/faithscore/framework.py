@@ -22,7 +22,7 @@ cur_path = os.path.join(cur_path, "faithscore")
 class FaithScore():
     def __init__(self, vem_type, api_key=None, llava_path=None, tokenzier_path=None, use_llama=False, llama_path=None):
         openai.api_key = api_key
-        openai.api_base = ""  # use when necessary
+        openai.api_base = ""  # set when necessary
         max_seq_len = 500
         max_batch_size = 1
         self.use_llama = use_llama
@@ -46,12 +46,12 @@ class FaithScore():
         while True:
             try:
                 response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo-1106",  # TODO change model
+                    model="gpt-3.5-turbo-1106",
                     messages=[
                         {"role": "user",
                          "content": pts},
                     ],
-                    temperature=0.1,  # TODO: figure out which temperature is best for evaluation
+                    temperature=0.1,  # see which temperature is best for evaluation
                 )
                 return response['choices'][0]['message']['content']
             except Exception as e:
@@ -109,7 +109,8 @@ class FaithScore():
                 continue
             response = self.call_openai(pts)
             # print(response)
-            if ("Entities" in response) and ("Relations" in response) and ("Colors" in response) and ("Counting" in response) and ("Other attributes" in response):
+            if ("Entities" in response) and ("Relations" in response) and ("Colors" in response) and (
+                "Counting" in response) and ("Other attributes" in response):
                 results.append(response)
             else:
                 results.append(nons)
@@ -152,8 +153,6 @@ class FaithScore():
             except:
                 print(f'{i} failed')
                 continue
-        # hallucinations = [Entities[i] + Relations[i] + Colors[i] + Counting[i] + Others[i] for i in range(len(Entities))]
-        # print(hallucinations)
         return hallucinations, Entities, Relations, Colors, Counting, Others
 
     def stage3(self, atomic_facts, images, img_path=None):

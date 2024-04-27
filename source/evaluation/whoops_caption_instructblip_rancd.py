@@ -229,7 +229,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     #TODO set your path for model and whoops data
-    args.whoops_path = '/DATA3/yangdingchen/whoops/'
+    args.whoops_path = '/path/to/your/whoops/'
     args.result_path = args.whoops_path + 'results/' + get_timestamp() 
     Path(args.result_path).mkdir(parents=True, exist_ok=True)
     
@@ -255,7 +255,6 @@ if __name__ == "__main__":
         args.kNN = 4
         
     decode_assist = 'wo-cd'
-        
     if args.use_rancd:
         assert args.decode_method in ['greedy', 'sample']
         args.oracle_noise_step = 500
@@ -273,7 +272,7 @@ if __name__ == "__main__":
     args.answers_file_name = answer_file_prefix + f'_{args.decode_method}_{decode_assist}.json'
     
     args.database = 'coco'
-    args.coco_path = '/DATA3/yangdingchen/coco/images/'
-    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    args.coco_path = '/path/to/your/coco/images/'
+    args.q_nn_file_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     set_seed(args.seed)
     eval_model(args)

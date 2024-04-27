@@ -16,7 +16,6 @@ from decoding.jsd import calculate_jsd
 # to draw fig.2 and fig.10 ~ 15 in our paper
 
 #TODO set your visual hallucination analysis directory
-
 # model_name = 'llava15'
 model_name = 'instructblip'
 
@@ -27,7 +26,8 @@ noise_step = 999
 topk = 50
 # topd = 10
 
-whoops_result_path = '/DATA3/yangdingchen/whoops/results/'
+#TODO set your model and result path
+whoops_result_path = '/path/to/your/whoops/results/'
 analysis_file_name = f'{model_name}_whoops_headvocab_analysis_image_{sample_method}_{decode_assist}.json'
 results_file_name = f'{model_name}_whoops_zeroshot_captions_image_{sample_method}_{decode_assist}.json'
 logits_file_name = results_file_name.replace('.json', '.hdf5')
@@ -36,13 +36,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 print("loading tokenizer")
 if model_name == 'llava15':
-    result_time_dir = ''
-    model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
+    result_time_dir = 'yymmdd-hhmmss'
+    model_path = '/path/to/your/llava-v1.5-7b'
     model_path = os.path.expanduser(model_path)
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
 elif model_name == 'instructblip':
-    result_time_dir = ''
-    llm_model = "/DATA3/yangdingchen/checkpoint/vicuna-7b-v1.1"
+    result_time_dir = 'yymmdd-hhmmss'
+    llm_model = "/path/to/your/vicuna-7b-v1.1"
     tokenizer = LlamaTokenizer.from_pretrained(llm_model, use_fast=False, truncation_side="left")
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     tokenizer.add_special_tokens({'bos_token': '</s>'})

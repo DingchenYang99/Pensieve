@@ -129,7 +129,6 @@ if __name__ == "__main__":
     parser.add_argument("--lbench_path", type=str, default="")
     parser.add_argument("--result_path", type=str, default=None)
     parser.add_argument("--answers_file_name", type=str, default=None)
-    parser.add_argument("--logits_file_name", type=str, default=None)
     
     parser.add_argument("--conv_mode", type=str, default="llava_v1")
     parser.add_argument("--num_chunks", type=int, default=1)
@@ -143,15 +142,16 @@ if __name__ == "__main__":
     parser.add_argument("--alpha_base", type=float)
     parser.add_argument("--jsd_thres", type=float, default=None)
     
-    parser.add_argument("--use_rancd", action='store_true', default=False)
-    parser.add_argument("--decode_method", type=str, default='', choices=['greedy', 'sample', 'beamsearch'])
-    parser.add_argument("--oracle_noise_step", type=int, default=900)
+    parser.add_argument("--use_rancd", action='store_true', default=True)
+    parser.add_argument("--decode_method", type=str, default='', 
+                        choices=['greedy', 'sample', 'beamsearch'])
+    parser.add_argument("--oracle_noise_step", type=int)
     parser.add_argument("--kNN", type=int)
     parser.add_argument("--racd_topk", type=int)
     args = parser.parse_args()
     
     #TODO set your path for model and data
-    args.lbench_path = '/DATA3/yangdingchen/llava-bench/'
+    args.lbench_path = '/path/to/your/llava-bench/'
     args.result_path = args.lbench_path + 'results/' + get_timestamp() 
     Path(args.result_path).mkdir(parents=True, exist_ok=True)
     
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     args.answers_file_name = answer_file_prefix + f'_{args.decode_method}_{decode_assist}.json'
     
     args.database = 'coco'
-    args.database_path = f'/DATA3/yangdingchen/coco/images/'
-    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    args.database_path = '/path/to/your/coco/images/'
+    args.q_nn_file_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     set_seed(args.seed)
     eval_model(args)

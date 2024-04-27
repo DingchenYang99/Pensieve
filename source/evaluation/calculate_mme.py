@@ -175,12 +175,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     #TODO set your results path
-    timedir = ''
-    args.results_dir = "/DATA3/yangdingchen/mme/results/" + timedir
+    timedir = 'yymmdd-hhmmss'
+    args.results_dir = "/path/to/your/mme/results/" + timedir
     
-    args.model_name = "instructblip"
-    # args.model_name = "llava15"
+    # args.model_name = "instructblip"
+    args.model_name = "llava15"
     
-    args.decode_assist = 'w-rancd'
-    # args.decode_assist = 'wo-cd'
+    args.decode_assist = 'w-rancd'  # enable pensieve
+    # args.decode_assist = 'wo-cd'  # disable pensieve
     cal.process_result(args)

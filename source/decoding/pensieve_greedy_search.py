@@ -18,7 +18,7 @@ from transformers.generation.stopping_criteria import (
 import transformers
 from transformers.generation.utils import GreedySearchOutput, GreedySearchDecoderOnlyOutput, GreedySearchEncoderDecoderOutput
 
-from jsd import calculate_jsd
+from .jsd import calculate_jsd
 
 def greedy_search(
     self,

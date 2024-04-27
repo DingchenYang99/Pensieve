@@ -176,7 +176,7 @@ if __name__ == "__main__":
     parser.add_argument("--alpha_base", type=float)
     parser.add_argument("--jsd_thres", type=float, default=None)
 
-    parser.add_argument("--use_rancd", action='store_true', default=False)
+    parser.add_argument("--use_rancd", action='store_true', default=True)
     parser.add_argument("--oracle_noise_step", type=int)
     parser.add_argument("--kNN", type=int)
     parser.add_argument("--racd_topk", type=int)
@@ -184,14 +184,14 @@ if __name__ == "__main__":
     set_seed(args.seed)
     
     #TODO set your path for model and data
-    args.mme_path = "/DATA3/yangdingchen/mme/"
-    args.model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
-    args.result_path = args.mme_path + 'results/' + get_timestamp()
+    args.mme_path = "/path/to/your/mme/"
+    args.model_path = '/path/to/your/llava-v1.5-7b'
+    args.result_path = args.mme_path + 'results/' + get_timestamp()  # yymmdd-hhmmss
     args.image_folder = args.mme_path + 'MME_Benchmark_release_version/'
     Path(args.result_path).mkdir(parents=True, exist_ok=True)
     
-    args.use_rancd = True
-    args.do_sample = False
+    args.use_rancd = True  # enable pensieve
+    args.do_sample = False  # use greedy decoding
     
     args.interested_task_names = [
         "existence", 
@@ -219,6 +219,6 @@ if __name__ == "__main__":
         args.jsd_thres = None
     
     args.database = 'coco'
-    args.coco_path = '/DATA3/yangdingchen/coco/images/'
-    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    args.coco_path = '/path/to/your/coco/images/'
+    args.q_nn_file_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     eval_model(args)

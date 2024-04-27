@@ -248,7 +248,8 @@ if __name__ == "__main__":
     parser.add_argument("--jsd_thres", type=float, default=None)
     
     parser.add_argument("--use_rancd", action='store_true', default=True)
-    parser.add_argument("--decode_method", type=str, default='',  choices=['greedy', 'sample', 'beamsearch'])
+    parser.add_argument("--decode_method", type=str, default='',  
+                        choices=['greedy', 'sample', 'beamsearch'])
     parser.add_argument("--noise_steps", type=list, help="noise step list")
     parser.add_argument("--oracle_noise_step", type=int, default=900)
     parser.add_argument("--kNN", type=int)
@@ -256,8 +257,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     #TODO set your path for llava model and whoops data
-    args.model_path = '/DATA3/yangdingchen/checkpoint/llava-v1.5-7b'
-    args.whoops_path = '/DATA3/yangdingchen/whoops/'
+    args.model_path = '/path/to/your/llava-v1.5-7b'
+    args.whoops_path = '/path/to/your/whoops/'
     args.result_path = args.whoops_path + 'results/' + get_timestamp() 
     Path(args.result_path).mkdir(parents=True, exist_ok=True)
     
@@ -273,7 +274,7 @@ if __name__ == "__main__":
         args.do_sample = True
         args.top_p = 1
         args.top_k = None
-        print(f"top-p {args.top_p}, top-k {args.top_k}")
+        # print(f"top-p {args.top_p}, top-k {args.top_k}")
     elif args.decode_method == 'beamsearch':
         args.num_beams = 3
         args.do_sample = False
@@ -303,7 +304,7 @@ if __name__ == "__main__":
     args.answers_file_name = answer_file_prefix + f'_{args.decode_method}_{decode_assist}.json'
     
     args.database = 'coco'
-    args.coco_path = '/DATA3/yangdingchen/coco/images/'
-    args.q_nn_file_path = '/home/lufan/Projects/VCD/experiments/rag/q_nn_files/'
+    args.coco_path = '/path/to/your/coco/images/'
+    args.q_nn_file_path = '/path/to/your/Pensieve/source/rag/q_nn_files/'
     set_seed(args.seed)
     eval_model(args)

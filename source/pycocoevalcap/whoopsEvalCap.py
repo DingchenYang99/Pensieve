@@ -100,7 +100,7 @@ class WhoopsEvalCap:
 
 if __name__ == '__main__':
     #TODO set your data and results path
-    whoops_path = '/DATA3/yangdingchen/whoops/'
+    whoops_path = '/path/to/your/whoops/'
     data_root = whoops_path + 'results/'
     anno_file = whoops_path + 'whoops_dataset.csv'
     blip_results_file = whoops_path + 'whoops_dataset_for_evaluation.csv'
@@ -109,12 +109,11 @@ if __name__ == '__main__':
     model_name = 'llava15'
     # model_name = 'instructblip'
     
-    time_dir = ''
+    time_dir = 'yymmdd-hhmmss'
     dataDir = data_root + time_dir 
     
     # decode_method = 'sample'
     decode_method = 'greedy'
-    # decode_method = 'beamsearch'
     
     # decode_assist = 'w-rancd'
     decode_assist = 'wo-cd'
@@ -143,7 +142,7 @@ if __name__ == '__main__':
         pred_cap = res_dict["caption_pred"]
         results[image_id] = [{'caption': pred_cap.rstrip(".") if pred_cap.endswith(".") else pred_cap}]
         
-    # debug
+    # try read the officially released result file
     # whoops_blip result is downloaded from 
     # whoops official website https://whoops-benchmark.github.io/
     # whoops_blip = load_blip_results_for_whoops(whoops_path)
