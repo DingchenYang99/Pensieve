@@ -56,7 +56,8 @@ We use the COCO Caption dataset to build our reference dataset. You may DIY your
 ### 4. Build the Reference Database
 We pre-retrieve visual references before MLLMs' inference stage.
 - run the script `/Pensieve/source/rag/build_index.py` to build the reference database.
-- run the script `/Pensieve/source/rag/retrieve_neighbours.py` to retrieve references for each samples in all test datasets. The file path of visual references is written to a `json` file, which is loaded in before inference.
+- run the script `/Pensieve/source/rag/retrieve_neighbours.py` to retrieve references for each samples in all test datasets.
+- The file paths of retrieved visual references are written into a `json` file saved to `/Pensieve/source/rag/q_nn_files/`, which are loaded in before inference.
 
 ### 5. Evaluation Metrics
 - Prepare the coco caption evaluation suite from [here](https://github.com/tylin/coco-caption/tree/master) for image captioning metrics.
@@ -64,7 +65,7 @@ We pre-retrieve visual references before MLLMs' inference stage.
 
 ### 6. Run Inference
 - Inference scripts can be found at `/Pensieve/source/evaluation`.
-- To reproduce the results of our analysis for visual hallucination, set `save_logits` to `True` in `/Pensieve/source/evaluation/whoops_caption_llava_rancd.py`. This will save all predicted logit distributions for each decoded token. Then, run `/Pensieve/source/evaluation/eval_whoops_visual_influence.py` and `/Pensieve/source/evaluation/eval_whoops_nns_influence.py` to see whether MLLMs are blind amidst visual hallucination, and analogous visual hallucinations among similar images.
+- To reproduce the results of our analysis for visual hallucination, set `save_logits` to `True` in `/Pensieve/source/evaluation/whoops_caption_llava_rancd.py`. This will save all predicted logit distributions for each decoded token. Then, run `/Pensieve/source/evaluation/eval_whoops_visual_influence.py` and `/Pensieve/source/evaluation/eval_whoops_nns_influence.py` to see whether MLLMs are blind amidst visual hallucination, and analogous visual hallucinations among similar images. For results visualization, you may use `/Pensieve/source/util/plot_per_token.ipynb`.
 - You can get quantitative results on POPE with `/Pensieve/source/evaluation/calculate_pope.py`, and results on MME with `/Pensieve/source/evaluation/calculate_mme.py`.
 ## 🏅 Experiments
 ### Quantitative Results on Whoops
@@ -77,7 +78,7 @@ We pre-retrieve visual references before MLLMs' inference stage.
 Our project is built upon VCD. We sincerely acknowledge the great contribution of the following works:
 - [VCD](https://github.com/DAMO-NLP-SG/VCD): Mitigating Object Hallucinations in Large Vision-Language Models through Visual Contrastive Decoding
 - [DOLA](https://github.com/salesforce/LAVIS/tree/main/projects/instructblip): Decoding by Contrasting Layers Improves Factuality in Large Language Models
-- [FaishScore](https://github.com/bcdnlp/FAITHSCORE): Evaluating Hallucinations in Large Vision-Language Models
+- [FaithScore](https://github.com/bcdnlp/FAITHSCORE): Evaluating Hallucinations in Large Vision-Language Models
 - [LLaVA-1.5](https://github.com/haotian-liu/LLaVA): Improved Baselines with Visual Instruction Tuning
 - [InstructBLIP](https://github.com/salesforce/LAVIS/tree/main/projects/instructblip): Towards General-purpose Vision-Language Models with Instruction Tuning
 
