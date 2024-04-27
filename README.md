@@ -6,7 +6,7 @@
 This is the official repo of our work "Pensieve", a training free method to mitigate visual hallucination in Multi-modal LLMs.
 
 ## 🪜 Updates
-- [2024-04-??]: 🧑🏻‍💻👩🏼‍💻 Code Release.
+- [2024-04-27]: 🧑🏻‍💻👩🏼‍💻 Code Release!
 - [2024-03-21]: 🎉🎉 Our [Paper](https://arxiv.org/abs/2403.14401) is available on Arxiv.
 
 ## 🖼️ Overview
