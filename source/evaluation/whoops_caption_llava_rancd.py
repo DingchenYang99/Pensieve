@@ -23,9 +23,11 @@ from data.whoops.whoops_utils import load_data_for_whoops
 from decoding.vcd_add_noise import add_diffusion_noise
 from decoding.pensieve_sample import evolve_sampling
 from decoding.pensieve_greedy_search import evolve_greedy_search
+from decoding.pensieve_beam_search import replace_rancd_beam_search
 
 evolve_sampling()
 evolve_greedy_search()
+replace_rancd_beam_search()
 
 def eval_model(args):
     # Load Model
@@ -288,7 +290,7 @@ if __name__ == "__main__":
     
     decode_assist = 'wo-cd'
     if args.use_rancd:
-        assert args.decode_method in ['greedy', 'sample']
+        assert args.decode_method in ['greedy', 'sample', 'beamsearch']
         args.oracle_noise_step = 900
         args.racd_topk = 50
         args.kNN = 4

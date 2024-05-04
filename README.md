@@ -12,6 +12,8 @@ This is the official repo of our work "Pensieve", a training free method to miti
 Our investigation on visual hallucination suggests a different perspective: the MLLMs might **not** be entirely oblivious to accurate visual cues when they hallucinate. Inspired by this, we try to elicit accurate image descriptions from a non-blind MLLM, which is a crucial initial step in mitigating visual hallucination. We make our source code for visual hallucination analysis, reference database construction, and our proposed decoding strategy publicly available in this repo.
 
 ## 🪜 Updates
+- [2024-05-04]: 📝📝 We release the retrieved image filenames corresponding to each test sample in our experiments.
+- [2024-05-04]: 🌈🌈 We release code for integrating Pensieve with beam search.
 - [2024-04-27]: 🧑🏻‍💻👩🏼‍💻 Our code is released.
 - [2024-03-21]: 🎉🎉 Our [Paper](https://arxiv.org/abs/2403.14401) is available on Arxiv.
 
@@ -57,7 +59,7 @@ We use the COCO Caption dataset to build our reference dataset. You may DIY your
 We pre-retrieve visual references before MLLMs' inference stage.
 - run the script `/Pensieve/source/rag/build_index.py` to build the reference database.
 - run the script `/Pensieve/source/rag/retrieve_neighbours.py` to retrieve references for each samples in all test datasets.
-- The file paths of retrieved visual references are written into a `json` file saved to `/Pensieve/source/rag/q_nn_files/`, which are loaded in before inference.
+- The file paths of retrieved visual references are written into a `json` file saved to `/Pensieve/source/rag/q_nn_files/`, which are loaded in before inference. We also provide our pre-retrieved results in this folder, which may be helpful for a quick start.
 
 ### 5. Evaluation Metrics
 - Prepare the coco caption evaluation suite from [here](https://github.com/tylin/coco-caption/tree/master) for image captioning metrics.
